@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    #myTextarea {
+      margin-left: 30px;
+      resize: vertical;
+      height: 96vh;
+      width: 96%;
+      box-sizing: border-box;
+      padding: 10px;
+      border: 1px solid #ccc;
+      display: block;
+    }
+
+    body,
+    html {
+      height: 100%;
+      margin: 0;
+	background-color: #3246ef;
+    }
+  </style>
+</head>
+
+<body>
+  <br>
+  <div style="margin-left: 30px;">
+    <button onclick="cutEngTextarea()">영어문장 잘라내기</button>
+    <button onclick="cutKorTextarea()">한글문장 잘라내기</button>
+  </div>
+  <br>
+  <textarea id="myTextarea" rows="4" cols="50"></textarea>
+
+  <script>
+    let MAX_TEXT_LENGTH = 0;
+    const textarea = document.getElementById("myTextarea");    
+
+    function cutEngTextarea() {
+      MAX_TEXT_LENGTH = 15000;
+      cutTextarea();
+    }
+
+    function cutKorTextarea() {
+      MAX_TEXT_LENGTH = 3100;
+      cutTextarea();
+    }
+
+    function cutTextarea() {
+      const text = textarea.value;
+      const text_to_be_cut = text.substring(0, MAX_TEXT_LENGTH);
+      const text_to_remain = text.substring(MAX_TEXT_LENGTH);
+
+      navigator.clipboard.writeText("모든 답변은 '이다. 한다.' 등으로 글자수를 최대한 줄여.아래의 글을 항목별로 요약하여 한글로 보여줘 \n\n" + text_to_be_cut).then(function () {
+        textarea.value = text_to_remain;
+      }, function () {
+        // 클립보드 복사 실패 처리
+      });
+    }
+
+    function cleanTextarea() {
+      let text = textarea.value
+        .replace(/<\/?[^>]+(>|$)/gm, "")
+        .replace(/(^#{1,6}\s.*)|(^\*\s.*)|(- \[.*?\]\(.*?\))/gm, "")
+        .replace(/- \[\d+:\d+\].*$/gm, "")
+        .replace(/\[\s*__\s*\]/g, "")
+        .replace(/\[\s*Music\s*\]/g, "")
+        .replace(/ {2,}/g, " ")
+        .replace(/https:.*/g, "")
+        .replace(/!\[\]\(/g, "")
+        .replace(/\n/g, "");
+
+      textarea.value = text;
+    }
+
+    function cutFromEnd(str, length) {
+      if (str.length <= length) {
+        return str;
+      } else {
+        return '...' + str.substring(str.length - length + 3, str.length);
+      }
+    }
+
+    textarea.addEventListener('input', cleanTextarea);
+  </script>
+</body>
+
+</html>
